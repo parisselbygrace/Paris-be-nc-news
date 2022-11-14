@@ -1,0 +1,7 @@
+const { selectTopics } = require(`/home/srvadmin/northcoders/backend/be-nc-news/models/selecttopics`);
+
+exports.getTopics = (request, response) => {
+  selectTopics().then(topics => {
+    response.status(200).send({ topics });
+  });
+};
