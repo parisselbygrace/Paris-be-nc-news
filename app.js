@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const {getTopics} = require ("./contorllors/getTopics");
-const {getArticles, getArticleById} = require ("./contorllors/articles");
+const {getArticles, getArticleById, getArticleCommentsById} = require ("./contorllors/articles");
 
 
 app.use(express.json());
@@ -9,6 +9,7 @@ app.use(express.json());
 app.get("/api/topics", getTopics);
 app.get(`/api/articles`, getArticles);
 app.get(`/api/articles/:article_id`, getArticleById);
+app.get(`/api/articles/:article_id/comments`, getArticleCommentsById);
 
 app.all("/*", (req, res) => {
     res.status(404).send({ msg: "End point not found" });

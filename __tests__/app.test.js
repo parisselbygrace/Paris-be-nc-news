@@ -87,7 +87,7 @@ describe("GET /api/topics", () => {
             .get("/api/articles/1")
             .expect(200);
         });
-        test("return an object of the requested article with total comments", () => {
+        test("return an object of the requested article ", () => {
           return request(app)
             .get("/api/articles/1")
             .then(({ body }) => {
@@ -103,6 +103,57 @@ describe("GET /api/topics", () => {
                 }))
             });
         });
+        test("400: responds with an error when passed an article_id of an incorrect type", () => {
+          return request(app)
+            .get("/api/articles/not-a-number")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe("invalid article id");
+            });
+        });
+        test("404: responds with an error when passed an article_id not present in our database", () => {
+          return request(app)
+            .get("/api/articles/100000")
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toBe("Id does not exisit");
+            });
+        });
+      });
+
+      describe("GET /api/articles/:article_id", () => {
+        test("return status 200 when successful", () => {
+          return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200);
+        });
+        test("return an object of the requested article with total comments", () => {
+          return request(app)
+            .get("/api/articles/1/comments")
+            .then(({ body }) => {
+                const{comments} = body
+                expect(comments).toBeSortedBy('created_at', {descending: true})
+                comments.forEach((comment) => {
+                expect(comment).toEqual(
+                expect.objectContaining({
+                    body: expect.any(String),
+                    votes: expect.any(Number),
+                    author: expect.any(String),
+                    article_id: expect.any(Number),
+                    created_at: expect.any(String),
+                }))
+            })
+            });
+        });
+        test("200: should return empty array if article has no comments", () => {
+            return request(app)
+              .get("/api/articles/8/comments")
+              .expect(200)
+              .then(({ body }) => {
+                expect(body.comments).toHaveLength(0);
+                expect(body.comments).toEqual([]);
+              });
+          });
         test("400: responds with an error when passed an article_id of an incorrect type", () => {
           return request(app)
             .get("/api/articles/not-a-number")
