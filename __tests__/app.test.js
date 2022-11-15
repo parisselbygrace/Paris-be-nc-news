@@ -6,7 +6,7 @@ const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
 
 afterAll(() => {
-  db.end();
+  return db.end();
 });
 
 beforeEach(() => {
@@ -47,4 +47,35 @@ describe("GET /api/topics", () => {
           });
         });
     });
-  });
+
+  
+    describe("GET /api/articles", () => {
+        test( "return a 200: should respond with array of article objects ", () => {
+          return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles.length).toBe(12);
+              body.articles.forEach((article) => {
+                expect(article).toMatchObject({
+                  author: expect.any(String),
+                  title: expect.any(String),
+                  article_id: expect.any(Number),
+                  topic: expect.any(String),
+                  created_at: expect.any(String),
+                  votes: expect.any(Number),
+                  comment_count: expect.any(String),
+                });
+              });
+            });
+        });
+        test('return a 200: sorted by decednding data', () => {
+          return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(({body}) => {
+              expect(body.articles).toBeSortedBy("created_at", {descending: true})
+            })
+        });
+      });
+    })
