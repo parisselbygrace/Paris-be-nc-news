@@ -1,4 +1,4 @@
-const {selectArticles} = require(`/home/srvadmin/northcoders/backend/be-nc-news/models/selectArticles`);
+const {selectArticles} = require(`../models/selectArticles`);
 
 
 exports.getArticles = (req, res, next) => {
