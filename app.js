@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
-const {getTopics} = require ("/home/srvadmin/northcoders/backend/be-nc-news/contorllors/getTopics");
-const {getArticles} = require ("/home/srvadmin/northcoders/backend/be-nc-news/contorllors/articles")
+const {getTopics} = require ("./contorllors/getTopics");
+const {getArticles} = require ("./contorllors/articles")
 
 
 app.use(express.json());
