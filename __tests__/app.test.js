@@ -79,3 +79,44 @@ describe("GET /api/topics", () => {
         });
       });
     })
+
+ 
+      describe("GET /api/articles/:article_id", () => {
+        test("return status 200 when successful", () => {
+          return request(app)
+            .get("/api/articles/1")
+            .expect(200);
+        });
+        test("return an object of the requested article with total comments", () => {
+          return request(app)
+            .get("/api/articles/1")
+            .then(({ body }) => {
+                const{article} = body
+              expect(article).toEqual(
+                expect.objectContaining({
+                author: 'butter_bridge',
+                title: 'Living in the shadow of a great man',
+                article_id: 1 ,
+                topic: 'mitch',
+                created_at: '2020-07-09T20:11:00.000Z',
+                votes: 100,
+                }))
+            });
+        });
+        test("400: responds with an error when passed an article_id of an incorrect type", () => {
+          return request(app)
+            .get("/api/articles/not-a-number")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe("invalid article id");
+            });
+        });
+        test("404: responds with an error when passed an article_id not present in our database", () => {
+          return request(app)
+            .get("/api/articles/100000")
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toBe("Id does not exisit");
+            });
+        });
+      });

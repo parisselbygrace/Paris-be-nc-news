@@ -1,4 +1,5 @@
 const db = require(`../db/connection`);
+const {checkArticleExists} = require ('../db/db.js')
 
 
 exports.selectArticles = () => {
@@ -18,3 +19,17 @@ exports.selectArticles = () => {
       return result.rows;
     });
 };
+
+exports.selectArticleById = (article_id) => {
+    console.log('Hi')
+    return checkArticleExists(article_id).then(() => {
+    return db.query(`SELECT *
+            FROM articles
+            WHERE articles.article_id = $1
+            `,
+            [article_id]).then((article)=>{
+    console.log(article.rows[0])
+        return article.rows[0]})
+    })
+    }
+
