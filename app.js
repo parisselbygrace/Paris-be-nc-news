@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const {getTopics} = require ("./contorllors/getTopics");
 const {getArticles, getArticleById, getArticleCommentsById} = require ("./contorllors/articles");
+const { postComment } = require("./contorllors/articles");
 
 
 app.use(express.json());
@@ -11,6 +12,8 @@ app.get(`/api/articles`, getArticles);
 app.get(`/api/articles/:article_id`, getArticleById);
 app.get(`/api/articles/:article_id/comments`, getArticleCommentsById);
 
+app.post('/api/articles/:article_id/comments', postComment)
+
 app.all("/*", (req, res) => {
     res.status(404).send({ msg: "End point not found" });
   });
@@ -18,7 +21,21 @@ app.all("/*", (req, res) => {
 app.use((err, req, res, next) => {
     if(err.code === "22P02"){
         res.status(400)
-        .send({msg: "invalid article id"})}
+        .send({msg: "invalid data"})}
+      else next(err)
+})
+
+app.use((err, req, res, next) => {
+    if(err.code === "23503"){
+        res.status(404)
+        .send({msg: "bad request"})}
+      else next(err)
+})
+
+app.use((err, req, res, next) => {
+    if(err.code === "23502"){
+        res.status(400)
+        .send({msg: "more data required"})}
       else next(err)
 })
 
