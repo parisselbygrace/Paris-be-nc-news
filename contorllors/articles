@@ -1,7 +1,8 @@
 const {selectArticles,
    selectArticleById, 
    selectArticleCommentsById, 
-  addComment} = require(`../models/selectArticles`);
+  addComment,
+  patchedArticle} = require(`../models/selectArticles`);
 
 
 exports.getArticles = (req, res, next) => {
@@ -43,4 +44,16 @@ exports.postComment = (req, res, next) => {
     next(err)
   })
 
+}
+
+exports.patchVotes = (req, res, next) => {
+  const { article_id } = req.params
+  const votes = req.body
+  return patchedArticle(votes, article_id)
+    .then((article) => {
+      res.status(201).send({ article })
+    })
+    .catch((err) => {
+      next(err)
+    })
 }
