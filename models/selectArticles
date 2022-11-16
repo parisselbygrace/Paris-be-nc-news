@@ -38,3 +38,21 @@ exports.selectArticleById = (article_id) => {
             ).then((res) => {
             return res.rows}
             )}
+
+    exports.addComment = (newComment, article_id) => {
+        return checkArticleExists(article_id).then(() => {
+        const addedValues = [newComment.body, article_id, newComment.username]
+        return db.query(
+            `
+            INSERT INTO comments 
+            (body, article_id, author)
+            VALUES
+            ($1, $2, $3)
+            RETURNING *;
+            `, 
+            addedValues
+        ).then ((res) => {
+            return res.rows[0]
+        })
+    })
+    }

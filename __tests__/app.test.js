@@ -108,7 +108,7 @@ describe("GET /api/topics", () => {
             .get("/api/articles/not-a-number")
             .expect(400)
             .then(({ body }) => {
-              expect(body.msg).toBe("invalid article id");
+              expect(body.msg).toBe("invalid data");
             });
         });
         test("404: responds with an error when passed an article_id not present in our database", () => {
@@ -159,7 +159,7 @@ describe("GET /api/topics", () => {
             .get("/api/articles/not-a-number")
             .expect(400)
             .then(({ body }) => {
-              expect(body.msg).toBe("invalid article id");
+              expect(body.msg).toBe("invalid data");
             });
         });
         test("404: responds with an error when passed an article_id not present in our database", () => {
@@ -171,3 +171,94 @@ describe("GET /api/topics", () => {
             });
         });
       });
+
+      describe("POST /api/articles/:article_id/comments", () => {
+        test("returns 201: should post a new comment", () => {
+          const newComment = {
+            username: "butter_bridge",
+            body: "Bad article, 0 stars",
+          };
+          return request(app)
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+              expect(body.comment).toEqual({
+                article_id: 1,
+                comment_id: expect.any(Number),
+                author: "butter_bridge",
+                votes: 0,
+                created_at: expect.any(String),
+                body: "Bad article, 0 stars",
+              });
+            });
+        });
+       
+  });
+
+test("404: Should respond with 404 if passed an invalid id", () => {
+const newComment = {
+    username: "butter_bridge",
+    body: "Bad article, 0 stars",
+  }
+
+return request(app)
+  .post("/api/articles/500/comments")
+  .send(newComment)
+  .expect(404)
+  .then(({ body }) => {
+    expect(body.msg).toBe("Id does not exisit");
+  })
+})
+
+test("400: Should respond with 400 if passed wrong id datatype", () => {
+    const newComment = {
+        username: "butter_bridge",
+        body: "Bad article, 0 stars",
+      }
+return request(app)
+  .post("/api/articles/Hi/comments")
+  .send(newComment)
+  .expect(400)
+  .then(({ body }) => {
+    expect(body.msg).toBe("invalid data");
+  });
+});
+test("400: should respond with 400 if passed a comment with missing data", () => {
+    const newComment = {
+      };
+return request(app)
+  .post("/api/articles/1/comments")
+  .send(newComment)
+  .expect(400)
+  .then(({ body }) => {
+    expect(body.msg).toBe("more data required");
+  });
+});
+test("400: if passed comment with data of wrong type", () => {
+const newComment = {
+  username: 1234,
+  body: 4444,
+};
+return request(app)
+  .post("/api/articles/2/comments")
+  .send(newComment)
+  .expect(400)
+  .then(({ body }) => {
+    expect(body.msg).toBe("bad request");
+  });
+});
+test("404: if passed a username that isnt in the db", () => {
+const newComment = {
+  username: "paris",
+  body: "4444",
+};
+return request(app)
+  .post("/api/articles/1/comments")
+  .send(newComment)
+  .expect(400)
+  .then(({ body }) => {
+    expect(body.msg).toBe("bad request");
+  })
+})
+
