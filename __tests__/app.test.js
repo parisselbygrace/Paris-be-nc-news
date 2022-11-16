@@ -235,19 +235,6 @@ return request(app)
     expect(body.msg).toBe("more data required");
   });
 });
-test("400: if passed comment with data of wrong type", () => {
-const newComment = {
-  username: 1234,
-  body: 4444,
-};
-return request(app)
-  .post("/api/articles/2/comments")
-  .send(newComment)
-  .expect(400)
-  .then(({ body }) => {
-    expect(body.msg).toBe("bad request");
-  });
-});
 test("404: if passed a username that isnt in the db", () => {
 const newComment = {
   username: "paris",
@@ -256,7 +243,7 @@ const newComment = {
 return request(app)
   .post("/api/articles/1/comments")
   .send(newComment)
-  .expect(400)
+  .expect(404)
   .then(({ body }) => {
     expect(body.msg).toBe("bad request");
   })

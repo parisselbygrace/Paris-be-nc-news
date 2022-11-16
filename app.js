@@ -27,7 +27,7 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
     if(err.code === "23503"){
-        res.status(400)
+        res.status(404)
         .send({msg: "bad request"})}
       else next(err)
 })
