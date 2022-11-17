@@ -56,3 +56,21 @@ exports.selectArticleById = (article_id) => {
         })
     })
     }
+
+    exports.patchedArticle = (votes, article_id) => {
+      return checkArticleExists(article_id).then(() => {
+      return db
+        .query(
+          `
+        UPDATE articles
+        SET votes = votes + $1
+        WHERE article_id = $2
+        RETURNING *;
+      `,
+          [votes.inc_votes, article_id]
+        )
+        .then((res) => {
+          return res.rows[0];
+        })
+      })
+    }

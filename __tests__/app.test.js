@@ -249,3 +249,73 @@ return request(app)
   })
 })
 
+describe("PATCH /api/articles/:article_id", () => {
+    test("201: updates vote when passed a positive interger", () => {
+      const votes = { inc_votes: 1 };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(votes)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.article).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 101,
+          });
+        });
+    });
+    test("201: updates vote when passed a negative interger", () => {
+      votes = { inc_votes: -1 };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(votes)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.article).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 99,
+          });
+        });
+    });
+    test("404: Should respond with 404 if passed invalid id", () => {
+      const votes = { inc_votes: 1 };
+      return request(app)
+        .patch("/api/articles/500")
+        .send(votes)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Id does not exisit");
+        });
+    });
+    test("400: Should respond with 400 if passed a wrong datatype", () => {
+      const votes = { inc_votes: -10 };
+      return request(app)
+        .patch("/api/articles/notANumber")
+        .send(votes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid data")
+        })
+    })
+    test("400: if passed wrong data type", () => {
+      const votes = { inc_votes: "Hi" }
+      return request(app)
+        .patch("/api/articles/1")
+        .send(votes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid data")
+        })
+    })
+
+  })
+
