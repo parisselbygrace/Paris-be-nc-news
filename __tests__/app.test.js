@@ -317,5 +317,34 @@ describe("PATCH /api/articles/:article_id", () => {
         })
     })
 
-  })
+    test("400: should respond with 400 if passed a comment with missing data", () => {
+      const votes = {
+        };
+  return request(app)
+    .patch("/api/articles/1")
+    .send(votes)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("more data required");
+    })
 
+  })
+})
+
+describe("GET /api/users", () => {
+  test("200: responds with array of users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users.length).toBe(4);
+        body.users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          })
+        })
+      })
+  })
+})
