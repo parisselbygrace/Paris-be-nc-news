@@ -77,8 +77,68 @@ describe("GET /api/topics", () => {
               expect(body.articles).toBeSortedBy("created_at", {descending: true})
             })
         });
-      });
-    })
+        test("return a 200: should accept a topic to filter by", () => {
+          return request(app)
+            .get("/api/articles?topic=mitch")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles.length).toBe(11);
+              body.articles.forEach((article) => {
+                expect(article.topic).toBe("mitch");
+              });
+            });
+        });
+        test("return a 200: should accept a sort_by query, defaults to DESC", () => {
+          return request(app)
+            .get("/api/articles?sort_by=title")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles).toBeSortedBy("title", { descending: true });
+            });
+        });
+        test("return a 200: should take a order query", () => {
+          return request(app)
+            .get("/api/articles?order=asc")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles).toBeSortedBy("created_at");
+            });
+        });
+        test("returj a 200: queries should work together", () => {
+          return request(app)
+            .get("/api/articles?topic=mitch&sort_by=comment_count&order=asc")
+            .expect(200)
+            .then(({ body }) => {
+              body.articles.forEach((article) => {
+                expect(article.topic).toBe("mitch")
+              })
+            })
+          })
+          test("return a gi404: if passed a topic that doesnt exist", () => {
+            return request(app)
+              .get("/api/articles?topic=noTopic")
+              .expect(404)
+              .then(({ body }) => {
+                expect(body.msg).toBe("Topic not found");
+              });
+          });
+          test("return a 400: if passed invalid sort_by", () => {
+            return request(app)
+              .get("/api/articles?sort_by=notASort_by")
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.msg).toBe("Invalid sort_by query");
+              });
+          });
+          test("return a 400: if passed invalid order", () => {
+            return request(app)
+              .get("/api/articles?order=notAnOrder")
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.msg).toBe("Invalid order query");
+              });
+          });
+      })
 
  
       describe("GET /api/articles/:article_id", () => {
@@ -347,4 +407,5 @@ describe("GET /api/users", () => {
         })
       })
   })
+})
 })
