@@ -1,24 +1,62 @@
 const db = require(`../db/connection`);
-const {checkArticleExists} = require ('../db/db.js')
+const {checkArticleExists, checkTopicExists} = require ('../db/db.js')
+const format = require ("pg-format")
 
 
-exports.selectArticles = () => {
-  return db
-    .query(
-      `
-          SELECT articles.author, title, articles.article_id,
-              topic, articles.created_at, articles.votes,
-              COUNT(comments.body) AS comment_count
-              FROM articles
-              LEFT JOIN comments ON articles.article_id = comments.article_id
-              GROUP BY articles.article_id
-              ORDER BY articles.created_at DESC;
-      `
-    )
-    .then((result) => {
-      return result.rows;
-    });
-};
+
+exports.selectArticles = (
+  topic,
+  sort_by = "created_at",
+  order = "DESC"
+) => {
+  const newValues = []
+  order = order.toUpperCase();
+  const validSortByValues = [
+    "article_id",
+    "title",
+    "topic",
+    "author",
+    "created_at",
+    "votes",
+    "comment_count",
+  ];
+
+  if (!validSortByValues.includes(sort_by))
+    throw { status: 400, msg: "Invalid sort_by query" }
+  if (order !== "ASC" && order !== "DESC")
+    throw { status: 400, msg: "Invalid order query" }
+
+
+    let queryText = `
+    SELECT articles.author, title, articles.article_id,
+    topic, articles.created_at, articles.votes,
+    COUNT(comments.body) AS comment_count
+    FROM articles
+    LEFT JOIN comments ON articles.article_id = comments.article_id` ;
+
+let promises = [];
+if (topic) {
+  queryText += " WHERE topic = $1";
+  newValues.push(topic)
+  promises.push(checkTopicExists(topic))
+}
+
+queryText += `
+    GROUP BY articles.author, title, articles.article_id,
+             topic, articles.created_at, articles.votes
+    `;
+
+queryText += ` ORDER BY ${sort_by} ${order};`;
+
+console.log(queryText)
+
+promises.unshift(db.query(queryText, newValues));
+
+return Promise.all(promises).then((result) => {
+  return result[0].rows;
+});
+}
+
 
 exports.selectArticleById = (article_id) => {
     return checkArticleExists(article_id).then(() => {
