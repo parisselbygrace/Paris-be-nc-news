@@ -2,7 +2,8 @@ const express = require("express");
 const app = express();
 const {getTopics} = require ("./contorllors/getTopics");
 const {getArticles, getArticleById, getArticleCommentsById, postComment, patchVotes} = require ("./contorllors/articles");
-const {getUsers} = require ("./contorllors/users")
+const {getUsers} = require ("./contorllors/users");
+const { deleteComment } = require("./contorllors/deleteComments");
 
 
 app.use(express.json());
@@ -14,6 +15,7 @@ app.get(`/api/articles/:article_id/comments`, getArticleCommentsById);
 
 app.post('/api/articles/:article_id/comments', postComment)
 app.patch('/api/articles/:article_id', patchVotes)
+app.delete('/api/comments/:comment_id', deleteComment)
 
 app.get("/api/users", getUsers);
 

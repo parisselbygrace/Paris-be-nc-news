@@ -48,7 +48,6 @@ queryText += `
 
 queryText += ` ORDER BY ${sort_by} ${order};`;
 
-console.log(queryText)
 
 promises.unshift(db.query(queryText, newValues));
 

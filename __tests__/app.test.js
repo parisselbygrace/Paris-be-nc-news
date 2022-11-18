@@ -409,3 +409,30 @@ describe("GET /api/users", () => {
   })
 })
 })
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("return 204: delete comment with no return value", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then(({ body }) => {
+        expect(body).toEqual({})
+      });
+  });
+  test("return 404: if comment id doesn't exisit ", () => {
+    return request(app)
+      .delete("/api/comments/10000")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Comment not found")
+      });
+  });
+  test("return 400: if comment id is wrong datatype", () => {
+    return request(app)
+      .delete("/api/comments/notANumber")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid data");
+      });
+  });
+});
