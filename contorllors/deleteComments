@@ -1,0 +1,12 @@
+const {deleteCom} = require("../models/deleteComments");
+
+exports.deleteComment = (req, res, next) => {
+  const { comment_id } = req.params;
+  return deleteCom(comment_id)
+    .then(() => {
+      res.sendStatus(204);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
